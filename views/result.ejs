@@ -58,7 +58,7 @@
         <h1>Your Mental Health Score 🧠</h1>
 
         <div class="score">
-            <%= score %> / 45
+            <%= Math.round((score/45)*100) %> % STRESS
         </div>
 
         <div class="result">

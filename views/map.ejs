@@ -216,7 +216,7 @@ async function fetchHospitals(radius) {
             document.getElementById("loadingState").innerHTML =
                 `<div class="loading-spinner"></div>Finding hospitals... (attempt ${i + 1}/${OVERPASS_SERVERS.length})`;
 
-            const data = await fetchFromServer(server, radius);
+            const data = await  fetchFromServer(server, radius);
             console.log(`✅ Success from: ${server}`);
             return data.elements;
 

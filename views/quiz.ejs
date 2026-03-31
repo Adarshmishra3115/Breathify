@@ -13,7 +13,6 @@ body.dark {
     background: #121212;
 }
 
-/* CONTAINER */
 .container {
     max-width: 700px;
     margin: auto;
@@ -31,12 +30,10 @@ body.dark .container {
     color: white;
 }
 
-/* TITLE */
 h1 {
     margin-bottom: 10px;
 }
 
-/* PROGRESS */
 .progress {
     width: 100%;
     height: 10px;
@@ -49,13 +46,13 @@ h1 {
     height: 100%;
     width: 0%;
     background: linear-gradient(to right, #4facfe, #00c6ff);
+    border-radius: 10px;
+    transition: width 0.3s ease;
 }
 
-/* QUESTION */
 .question-box { display: none; }
 .question-box.active { display: block; }
 
-/* OPTIONS */
 .option {
     display: block;
     padding: 12px;
@@ -70,17 +67,23 @@ h1 {
     background: #f0f8ff;
 }
 
+body.dark .option {
+    border-color: #444;
+    color: white;
+}
+
 body.dark .option:hover {
     background: #333;
 }
 
-/* BUTTONS */
 .btn {
     padding: 12px 25px;
     border-radius: 25px;
     border: none;
     margin: 10px;
     cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
 }
 
 .next {
@@ -90,6 +93,7 @@ body.dark .option:hover {
 
 .prev {
     background: #aaa;
+    color: white;
 }
 
 .submit {
@@ -97,16 +101,36 @@ body.dark .option:hover {
     color: white;
 }
 
-/* TOGGLE */
+/* FIXED toggle — always visible in top-right corner */
 .toggle {
-    position: absolute;
-    top: 20px;
+    position: fixed;
+    top: 80px;        /* below navbar */
     right: 20px;
     cursor: pointer;
+    font-size: 24px;
+    z-index: 9999;    /* always on top */
+    background: white;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: 0.3s;
+}
+
+body.dark .toggle {
+    background: #1e1e1e;
+}
+
+.toggle:hover {
+    transform: scale(1.1);
 }
 </style>
 
-<div class="toggle" onclick="toggleDark()">🌙</div>
+<!-- Toggle is fixed, always visible -->
+<div class="toggle" onclick="toggleDark()" title="Toggle dark mode">🌙</div>
 
 <div class="container">
     <h1>Mental Health Quiz 🧠</h1>
@@ -152,12 +176,12 @@ const total = boxes.length;
 const progress = document.getElementById("progressBar");
 
 function updateProgress() {
-    progress.style.width = (current/total)*100 + "%";
+    progress.style.width = ((current / total) * 100) + "%";
 }
 
 function nextQuestion() {
     const selected = boxes[current].querySelector("input:checked");
-    if (!selected) return alert("Select an option");
+    if (!selected) return alert("Please select an option to continue.");
 
     boxes[current].classList.remove("active");
     current++;
@@ -174,6 +198,9 @@ function nextQuestion() {
 function prevQuestion() {
     if (current === 0) return;
 
+    // Hide submit button if going back from last question
+    document.getElementById("submitBtn").style.display = "none";
+
     boxes[current].classList.remove("active");
     current--;
     boxes[current].classList.add("active");
@@ -182,11 +209,15 @@ function prevQuestion() {
 }
 
 function autoNext() {
-    setTimeout(() => nextQuestion(), 300);
+    setTimeout(() => nextQuestion(), 400);
 }
 
 function toggleDark() {
     document.body.classList.toggle("dark");
+
+    // Change icon based on mode
+    const toggle = document.querySelector(".toggle");
+    toggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
 }
 
 updateProgress();
