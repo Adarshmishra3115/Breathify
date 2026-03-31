@@ -1,0 +1,247 @@
+<%- include("partials/header") %>
+<%- include("partials/navbar2") %>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+/* Container */
+.chat-container {
+    max-width: 800px;
+    height: 85vh;
+    margin: 30px auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+/* Header */
+.chat-header {
+    padding: 18px;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Chat Area */
+.chatbox {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Message Row */
+.message {
+    display: flex;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.user {
+    justify-content: flex-end;
+}
+
+.bot {
+    justify-content: flex-start;
+}
+
+/* Bubble */
+.bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 70%;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* User bubble */
+.user .bubble {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+/* Bot bubble */
+.bot .bubble {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border-bottom-left-radius: 5px;
+}
+
+/* Input Area */
+.chat-input {
+    display: flex;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.chat-input button {
+    margin-left: 10px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #00f2fe, #4facfe);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.chat-input button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* Typing */
+.typing {
+    font-size: 13px;
+    color: #ddd;
+    margin-left: 10px;
+    animation: blink 1s infinite;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* Scrollbar */
+.chatbox::-webkit-scrollbar {
+    width: 6px;
+}
+.chatbox::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
+</style>
+
+<div class="chat-container">
+
+    <div class="chat-header">
+        🧠 Dr Mind Chatbot
+    </div>
+
+    <div id="chat" class="chatbox"></div>
+
+    <div class="chat-input">
+        <input id="input" placeholder="Type your message..." />
+        <button onclick="sendMsg()">Send</button>
+    </div>
+
+</div>
+
+<script>
+let history = [];
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+// Enter key support
+input.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") sendMsg();
+});
+
+function addMessage(text, type) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", type);
+
+    // Avatar
+    if (type === "bot") {
+        const avatar = document.createElement("div");
+        avatar.innerText = "🧠";
+        avatar.style.marginRight = "8px";
+        msgDiv.appendChild(avatar);
+    }
+
+    const bubble = document.createElement("div");
+    bubble.classList.add("bubble");
+    bubble.innerText = text;
+
+    msgDiv.appendChild(bubble);
+    chat.appendChild(msgDiv);
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMsg() {
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, "user");
+    input.value = "";
+
+    // Typing indicator
+    const typingDiv = document.createElement("div");
+    typingDiv.classList.add("typing");
+    typingDiv.innerText = "Dr is typing...";
+    chat.appendChild(typingDiv);
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+        const res = await fetch("/bot/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: msg,
+                history: history
+            })
+        });
+
+        const data = await res.json();
+
+        chat.removeChild(typingDiv);
+
+        addMessage(data.reply, "bot");
+
+        // Store history
+        history.push({
+            role: "user",
+            parts: [{ text: msg }]
+        });
+
+        history.push({
+            role: "model",
+            parts: [{ text: data.reply }]
+        });
+
+    } catch (err) {
+        chat.removeChild(typingDiv);
+        addMessage("Error: Unable to connect to server", "bot");
+    }
+}
+</script>
+
+<%- include("partials/footer") %>

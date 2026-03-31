@@ -1,0 +1,383 @@
+<%- include("partials/header") %>
+<%- include("partials/navbar2") %>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #eef2f7;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 32%;
+    background: #ffffff;
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 20px;
+}
+
+.loading {
+    text-align: center;
+    color: #888;
+    padding: 40px 0;
+    font-size: 14px;
+}
+
+.loading-spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid #ddd;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.card {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: 0.3s;
+    border-left: 5px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.card.active {
+    border-left: 5px solid #3498db;
+    background: #f0f8ff;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 15px;
+    color: #2c3e50;
+    flex: 1;
+}
+
+.card p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.distance-badge {
+    display: inline-block;
+    margin-top: 8px;
+    background: #eaf4fb;
+    color: #2980b9;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.emergency-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: #fde8e8;
+    color: #c0392b;
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.map-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #3498db;
+    color: white;
+    border-radius: 6px;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.map-btn:hover { background: #217dbb; }
+
+#map {
+    width: 68%;
+    height: 100%;
+}
+
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+</style>
+
+<div class="container">
+    <div class="sidebar">
+        <h2 class="title">🏥 Nearby Hospitals</h2>
+        <div id="placesList">
+            <div class="loading" id="loadingState">
+                <div class="loading-spinner"></div>
+                Detecting your location...
+            </div>
+        </div>
+    </div>
+    <div id="map"></div>
+</div>
+
+<script>
+let map;
+let markers = [];
+let activeCard = null;
+let userLocation;
+
+const OVERPASS_SERVERS = [
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.openstreetmap.ru/api/interpreter",
+    "https://overpass-api.de/api/interpreter"
+];
+
+function haversineDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371000;
+    const toRad = x => x * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat/2) ** 2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLng/2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatDist(meters) {
+    return meters < 1000
+        ? `${Math.round(meters)} m`
+        : `${(meters / 1000).toFixed(2)} km`;
+}
+
+function buildQuery(radius) {
+    return `[out:json][timeout:30];(node["amenity"="hospital"](around:${radius},${userLocation.lat},${userLocation.lng});way["amenity"="hospital"](around:${radius},${userLocation.lat},${userLocation.lng});relation["amenity"="hospital"](around:${radius},${userLocation.lat},${userLocation.lng}););out center;`;
+}
+
+async function fetchFromServer(serverUrl, radius) {
+    const query = buildQuery(radius);
+    const url = `${serverUrl}?data=${encodeURIComponent(query)}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+    });
+
+    const text = await response.text();
+
+    if (text.trim().startsWith("<")) {
+        throw new Error(`${serverUrl} returned XML/HTML`);
+    }
+
+    return JSON.parse(text);
+}
+
+async function fetchHospitals(radius) {
+    for (let i = 0; i < OVERPASS_SERVERS.length; i++) {
+        const server = OVERPASS_SERVERS[i];
+        try {
+            console.log(`Trying server ${i + 1}/${OVERPASS_SERVERS.length}: ${server}`);
+            document.getElementById("loadingState").innerHTML =
+                `<div class="loading-spinner"></div>Finding hospitals... (attempt ${i + 1}/${OVERPASS_SERVERS.length})`;
+
+            const data = await fetchFromServer(server, radius);
+            console.log(`✅ Success from: ${server}`);
+            return data.elements;
+
+        } catch (err) {
+            console.warn(`❌ Server ${i + 1} failed:`, err.message);
+        }
+    }
+    throw new Error("All Overpass servers failed.");
+}
+
+function renderResults(elements) {
+    const list = document.getElementById("placesList");
+
+    if (!elements || elements.length === 0) {
+        list.innerHTML = `<p style='text-align:center;color:#888;'>No hospitals found nearby.</p>`;
+        return;
+    }
+
+    const places = elements.map(el => ({
+        name: el.tags?.name || "Unnamed Hospital",
+        lat: el.lat || el.center?.lat,
+        lng: el.lon || el.center?.lon,
+        address: [
+            el.tags?.["addr:housenumber"],
+            el.tags?.["addr:street"],
+            el.tags?.["addr:city"],
+            el.tags?.["addr:state"]
+        ].filter(Boolean).join(", ") || null,
+        phone: el.tags?.phone || el.tags?.["contact:phone"] || null,
+        emergency: el.tags?.emergency === "yes",
+        website: el.tags?.website || null
+    })).filter(p => p.lat && p.lng);
+
+    places.sort((a, b) => {
+        const dA = haversineDistance(userLocation.lat, userLocation.lng, a.lat, a.lng);
+        const dB = haversineDistance(userLocation.lat, userLocation.lng, b.lat, b.lng);
+        return dA - dB;
+    });
+
+    list.innerHTML = "";
+
+    places.slice(0, 12).forEach((place, index) => {
+
+        const distance = haversineDistance(
+            userLocation.lat, userLocation.lng, place.lat, place.lng
+        );
+        const displayDist = formatDist(distance);
+
+        const markerIcon = L.divIcon({
+            html: `<div style="
+                background:#e74c3c;color:white;border-radius:50%;
+                width:28px;height:28px;display:flex;align-items:center;
+                justify-content:center;font-weight:bold;font-size:13px;
+                border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35);
+                font-family:Poppins,sans-serif;">
+                ${index + 1}
+            </div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            className: ""
+        });
+
+        const marker = L.marker([place.lat, place.lng], { icon: markerIcon })
+            .addTo(map)
+            .bindPopup(`
+                <div style="font-family:Poppins,sans-serif;min-width:160px">
+                    <strong>#${index + 1} ${place.name}</strong><br>
+                    ${place.address ? `<small>📍 ${place.address}</small><br>` : ""}
+                    <small>📏 ${displayDist} away</small>
+                    ${place.phone ? `<br><small>📞 ${place.phone}</small>` : ""}
+                </div>
+            `);
+
+        markers.push(marker);
+
+        const div = document.createElement("div");
+        div.classList.add("card");
+        div.innerHTML = `
+            <div class="card-header">
+                <h3>#${index + 1} ${place.name}</h3>
+                ${place.emergency ? `<span class="emergency-badge">🚨 Emergency</span>` : ""}
+            </div>
+            <p>📍 ${place.address || "Address not available"}</p>
+            ${place.phone ? `<p>📞 ${place.phone}</p>` : ""}
+            ${place.website
+                ? `<p>🌐 <a href="${place.website}" target="_blank"
+                      style="color:#3498db;font-size:12px;">Visit Website</a></p>`
+                : ""}
+            <div class="card-footer">
+                <span class="distance-badge">📏 ${displayDist} away</span>
+                <a class="map-btn" target="_blank"
+                   href="https://www.openstreetmap.org/?mlat=${place.lat}&mlon=${place.lng}&zoom=17">
+                   Open in Maps
+                </a>
+            </div>
+        `;
+
+        div.onclick = () => {
+            map.setView([place.lat, place.lng], 16);
+            marker.openPopup();
+            if (activeCard) activeCard.classList.remove("active");
+            div.classList.add("active");
+            activeCard = div;
+            div.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        };
+
+        list.appendChild(div);
+    });
+}
+
+navigator.geolocation.getCurrentPosition(async position => {
+
+    userLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+    };
+
+    map = L.map("map").setView([userLocation.lat, userLocation.lng], 14);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    const userIcon = L.divIcon({
+        html: `<div style="
+            background:#3498db;border:3px solid white;
+            border-radius:50%;width:18px;height:18px;
+            box-shadow:0 0 0 4px rgba(52,152,219,0.3);">
+        </div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        className: ""
+    });
+
+    L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+        .addTo(map)
+        .bindPopup("<b>📍 You are here</b>")
+        .openPopup();
+
+    try {
+        const elements = await fetchHospitals(10000);
+        renderResults(elements);
+    } catch (err) {
+        console.error("All servers failed:", err);
+        document.getElementById("placesList").innerHTML = `
+            <p style='text-align:center;color:red;font-size:13px'>
+                ⚠️ Could not fetch hospitals.<br>
+                <small>All servers are currently unavailable.</small><br><br>
+                <button onclick="location.reload()" style="
+                    padding:8px 16px;background:#3498db;color:white;
+                    border:none;border-radius:8px;cursor:pointer;font-size:13px;">
+                    🔄 Retry
+                </button>
+            </p>`;
+    }
+
+}, () => {
+    document.getElementById("loadingState").innerHTML =
+        "⚠️ Location access denied. Please allow location to see nearby hospitals.";
+});
+</script>
+
+<%- include("partials/footer") %>

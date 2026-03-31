@@ -1,0 +1,212 @@
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* NAVBAR */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* LOGO */
+.navbar-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+/* NAV LINKS */
+.navbar-links {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+    align-items: center;
+}
+
+.navbar-links li {
+    position: relative;
+}
+
+.navbar-links li a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* DROPDOWN */
+.dropdown-menu {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    background: white;
+    border-radius: 10px;
+    padding: 10px 0;
+    display: none;
+    min-width: 160px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-menu a:hover {
+    background: #f4f6f9;
+}
+
+/* SHOW DROPDOWN */
+.navbar-links li:hover .dropdown-menu {
+    display: block;
+}
+
+/* AUTH */
+.navbar-auth {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* BUTTONS */
+.btn-signin {
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #2ecc71;
+    color: #3498db;
+    border: 2px solid #3498db;
+    font-weight: 600;
+}
+
+.btn-signup {
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #2ecc71;
+    color: white;
+    border: 2px solid #3498db;
+}
+
+.btn-logout {
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #e74c3c;
+    color: white;
+}
+
+/* HAMBURGER */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: white;
+}
+
+/* MOBILE MENU */
+.mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    padding: 16px 30px;
+    gap: 12px;
+}
+
+.mobile-menu a {
+    color: white;
+    text-decoration: none;
+}
+
+.mobile-menu.open {
+    display: flex;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .navbar-links,
+    .navbar-auth {
+        display: none;
+    }
+    .hamburger {
+        display: flex;
+    }
+}
+</style>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+
+    <!-- LOGO -->
+    <a href="/" class="navbar-logo">🧠 Breathify</a>
+
+    <!-- LINKS -->
+    <ul class="navbar-links">
+        <li><a href="/">Home</a></li>
+
+        <li>
+            <a href="#services">Services</a>
+            
+        </li>
+
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <!-- AUTH -->
+    <div class="navbar-auth">
+        <% if (user) { %>
+            <a href="/user/logout" class="btn-logout">Logout</a>
+        <% } else { %>
+            <a href="/user/signin" class="btn-signin">Sign In</a>
+            <a href="/user/signup" class="btn-signup">Sign Up</a>
+        <% } %>
+    </div>
+
+    <!-- HAMBURGER -->
+    <button class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="/">🏠 Home</a>
+    <a href="/box/quiz">📝 Quiz</a>
+    <a href="/box/bot">🤖 AI Companion</a>
+    <a href="/box/map">🩺 Hospitals</a>
+    <a href="#about">ℹ️ About</a>
+    <a href="#contact">📞 Contact</a>
+
+    <% if (user) { %>
+        <a href="/user/logout" class="btn-logout">Logout</a>
+    <% } else { %>
+        <a href="/user/signin" class="btn-signin">Sign In</a>
+        <a href="/user/signup" class="btn-signup">Sign Up</a>
+    <% } %>
+</div>
+
+<script>
+const hamburger = document.getElementById("hamburger");
+const mobileMenu = document.getElementById("mobileMenu");
+
+hamburger.addEventListener("click", () => {
+    mobileMenu.classList.toggle("open");
+});
+</script>

@@ -1,0 +1,73 @@
+<div style="
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+">
+
+    <div style="
+        width: 350px;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        text-align: center;
+    ">
+
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">
+            Create Account
+        </h2>
+
+        <form action="/user/signup" method="POST" style="
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        ">
+
+            <input type="text" name="fullName" placeholder="Full Name" required
+                style="padding:10px; border-radius:6px; border:1px solid #ccc;" />
+
+            <input type="number" name="age" placeholder="Age" required
+                style="padding:10px; border-radius:6px; border:1px solid #ccc;" />
+
+            <select name="gender" required
+                style="padding:10px; border-radius:6px; border:1px solid #ccc;">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+
+            <input type="email" name="email" placeholder="Email" required
+                style="padding:10px; border-radius:6px; border:1px solid #ccc;" />
+
+            <input type="password" name="password" placeholder="Password" required
+                style="padding:10px; border-radius:6px; border:1px solid #ccc;" />
+
+            <button type="submit" style="
+                padding: 10px;
+                border: none;
+                border-radius: 20px;
+                background: linear-gradient(135deg, #4facfe, #00f2fe);
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+                transition: 0.3s;
+            ">
+                Sign Up
+            </button>
+
+        </form>
+
+        <p style="margin-top: 15px;">
+            Already have an account? 
+            <a href="/user/signin" style="color:#3498db; text-decoration:none;">
+                Sign In
+            </a>
+        </p>
+
+    </div>
+
+</div>
+
+<%- include("partials/footer") %>

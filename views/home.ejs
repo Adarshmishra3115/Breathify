@@ -1,0 +1,221 @@
+<%- include("partials/header") %>
+    <%- include("partials/navbar") %>
+
+        <style>
+            html {
+                scroll-behavior: smooth;
+                font-family: 'Segoe UI', sans-serif;
+            }
+            /* HERO */
+            
+            .hero {
+                text-align: center;
+                padding: 100px 20px;
+                background: linear-gradient(135deg, #4facfe, #00f2fe);
+                color: white;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+                margin-bottom: 10px;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+            }
+            /* BUTTON */
+            
+            .btn {
+                padding: 12px 25px;
+                background: white;
+                color: #333;
+                border-radius: 25px;
+                text-decoration: none;
+                margin: 10px;
+                display: inline-block;
+                font-weight: bold;
+                transition: 0.3s;
+            }
+            
+            .btn:hover {
+                background: #f1f1f1;
+            }
+            /* SECTION */
+            
+            .section {
+                padding: 80px 20px;
+                text-align: center;
+            }
+            /* CARD (🔥 IMPROVED) */
+            
+            .card {
+                width: 280px;
+                height: 200px;
+                padding: 25px;
+                background: white;
+                border-radius: 18px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+                transition: 0.3s;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .card h2 {
+                color: #3498db;
+                font-size: 22px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                letter-spacing: 0.5px;
+            }
+            
+            .card p {
+                font-size: 15px;
+                color: #555;
+                line-height: 1.5;
+                max-width: 220px;
+            }
+            
+            .card:hover {
+                transform: translateY(-10px) scale(1.02);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            }
+            /* FEATURES */
+            
+            .features {
+                display: flex;
+                justify-content: center;
+                gap: 25px;
+                flex-wrap: wrap;
+                align-items: stretch;
+                background: #f7fbff;
+            }
+            /* SERVICES */
+            
+            .services {
+                background: #eef7ff;
+            }
+            
+            .services h1 {
+                margin-bottom: 40px;
+                font-size: 2.5rem;
+                color: #2c3e50;
+            }
+            
+            .services .card-container {
+                display: flex;
+                justify-content: center;
+                gap: 25px;
+                flex-wrap: wrap;
+                align-items: stretch;
+            }
+            /* ABOUT */
+            
+            .about {
+                background: #f4f6f9;
+            }
+            /* HELPLINE */
+            
+            .helpline {
+                background: #1e3c72;
+                color: white;
+            }
+            
+            .helpline p {
+                font-size: 1.2rem;
+            }
+            /* LINK RESET */
+            
+            a {
+                text-decoration: none;
+                color: inherit;
+            }
+        </style>
+
+
+        <!-- HERO -->
+        <section class="hero">
+            <h1>Welcome to Breathify 🧠</h1>
+            <p>Your mental wellness companion</p>
+
+            <a href="#services" class="btn">Explore Services</a>
+            <a href="#about" class="btn">Learn More</a>
+        </section>
+
+
+        <!-- FEATURES -->
+        <section class="section features">
+            <a href="/box/therapy">
+                <div class="card">
+                    <h2>🧘 Therapy</h2>
+                    <p>Feeling overwhelmed? Lets slow things down together</p>
+                </div>
+            </a>
+
+            <a href="/box/map">
+                <div class="card">
+                    <h2>🩺 Nearby Health Centres</h2>
+                    <p>Tap to see hospitals near you</p>
+                </div>
+            </a>
+
+            <div class="card">
+                <h2>💬 Chat Support</h2>
+                <p>Talk to experts anytime</p>
+            </div>
+        </section>
+
+
+        <!-- SERVICES -->
+        <section id="services" class="section services">
+            <h1>Our Services</h1>
+
+            <div class="card-container">
+
+                <a href="/box/quiz">
+                    <div class="card">
+                        <h2>📝 Quiz</h2>
+                        <p>Evaluate your mental state with smart quizzes</p>
+                    </div>
+                </a>
+
+                <a href="/box/bot">
+                    <div class="card">
+                        <h2>🤖 AI Companion</h2>
+                        <p>Chat with our intelligent chatbot anytime</p>
+                    </div>
+                </a>
+
+                <a href="/community">
+                    <div class="card">
+                        <h2>🌟 Who Overcame</h2>
+                        <p>Connect with people who overcame struggles</p>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+
+        <!-- ABOUT -->
+        <section id="about" class="section about">
+            <h1>About Breathify</h1>
+            <p>
+                Breathify helps individuals improve mental well-being through AI tools, therapy, and community support. A safe space for healing and growth.
+            </p>
+        </section>
+
+
+        <!-- HELPLINE -->
+        <section class="section helpline">
+            <h1>Need Immediate Help? 🚨</h1>
+            <p>📞 National Mental Health Helpline: 9152987821</p>
+            <p>📞 Emergency: 112</p>
+            <p>You are not alone. Help is always available.</p>
+        </section>
+
+
+        <%- include("partials/footer") %>

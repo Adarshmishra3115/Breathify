@@ -1,0 +1,78 @@
+<nav style="
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+">
+
+    <!-- LOGO -->
+    <a href="/" style="
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+" onmouseover="this.style.opacity='0.8'
+" onmouseout="this.style.opacity='1'">
+    🧠 Breathify
+</a>
+
+    <!-- NAV LINKS -->
+    <ul style="
+        display: flex;
+        list-style: none;
+        gap: 25px;
+        margin: 0;
+    ">
+        <li><a href="/" style="color:white; text-decoration:none;">Home</a></li>
+    </ul>
+
+    <!-- AUTH BUTTONS -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+
+        <% if (user) { %>
+
+            <a href="/user/logout" style="
+                padding: 6px 14px;
+                border-radius: 20px;
+                background: #e74c3c;
+                color: white;
+                text-decoration: none;
+                font-size: 14px;
+            ">
+                Logout
+            </a>
+
+            <% } else { %>
+
+                <a href="/user/signin" style="
+                padding: 6px 14px;
+                border-radius: 20px;
+                background: white;
+                color: #3498db;
+                text-decoration: none;
+                font-size: 14px;
+            ">
+                Sign In
+            </a>
+
+                <a href="/user/signup" style="
+                padding: 6px 14px;
+                border-radius: 20px;
+                background: #2ecc71;
+                color: white;
+                text-decoration: none;
+                font-size: 14px;
+            ">
+                Sign Up
+            </a>
+
+                <% } %>
+
+    </div>
+</nav>
