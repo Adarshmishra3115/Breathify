@@ -12,6 +12,7 @@ const boxRouter   = require("./routers/box");
 const botRouter   = require("./routers/api");
 const ytRouter    = require("./routers/yt_router");
 const chatRouter  = require("./routers/chat");
+const overcameRouter = require("./routers/overcame");
 
 const { checkForCookieAuthentication, isLoggedIn } = require("./middleware/authentication");
 
@@ -47,6 +48,7 @@ app.use("/box",   isLoggedIn, boxRouter);
 app.use("/bot",   botRouter);
 app.use("/yt",    ytRouter);
 app.use("/chat",  chatRouter);
+app.use("/overcame" , overcameRouter);
 
 app.get("/", (req, res) => {
     res.render("home", { title: "Breathify" });

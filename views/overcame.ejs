@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stories · Breathify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0d14; --panel: #1a1625; --border: #241e33;
+      --accent: #f59e0b; --accent2: #ef4444;
+      --text: #ede8f0; --muted: #9990aa; --dim: #5e5470;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* ── Hero ── */
+    .hero { position: relative; padding: 80px 40px 60px; text-align: center; overflow: hidden; }
+    .hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(245,158,11,0.12), transparent); pointer-events:none; }
+    .brand { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:.08em; text-transform:uppercase; margin-bottom:28px; }
+    .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(32px,5vw,56px); font-weight:800; line-height:1.1; margin-bottom:20px; }
+    .hero h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .hero p { font-size:17px; color:var(--muted); max-width:520px; margin:0 auto 40px; line-height:1.7; }
+    .stats { display:flex; justify-content:center; gap:48px; flex-wrap:wrap; margin-top:40px; }
+    .stat-num { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .stat-lbl { font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.1em; margin-top:4px; }
+    .divider { width:1px; height:48px; background:linear-gradient(to bottom, transparent, var(--border), transparent); }
+
+    /* ── Section ── */
+    .section { padding:60px 40px; max-width:1100px; margin:0 auto; }
+    .sec-head { text-align:center; margin-bottom:48px; }
+    .sec-head h2 { font-family:'Syne',sans-serif; font-size:28px; font-weight:700; margin-bottom:10px; }
+    .sec-head p { color:var(--muted); font-size:15px; }
+
+    /* ── Cards ── */
+    .featured { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+    .card { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:28px; position:relative; transition:border-color .2s; }
+    .card:hover { border-color:rgba(245,158,11,0.3); }
+    .card.big { background: linear-gradient(135deg, #1e1628 0%, #1a1625 100%); border-color:rgba(245,158,11,0.2); }
+    .card.big::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:16px 16px 0 0; }
+    .quote-mark { font-size:48px; line-height:1; color:var(--accent); opacity:.3; font-family:Georgia,serif; margin-bottom:8px; }
+    .quote-text { font-size:16px; line-height:1.7; color:#ccc5d8; margin-bottom:20px; }
+    .card.big .quote-text { font-size:18px; }
+    .stars { color:var(--accent); font-size:13px; margin-bottom:12px; letter-spacing:2px; }
+
+    /* ── Tags ── */
+    .feature-tag { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; margin-bottom:16px; text-transform:uppercase; letter-spacing:.07em; }
+    .tag-ai    { background:rgba(99,102,241,0.15);  color:#a5b4fc; border:1px solid rgba(99,102,241,0.2);  }
+    .tag-music { background:rgba(52,211,153,0.12);  color:#6ee7b7; border:1px solid rgba(52,211,153,0.2);  }
+    .tag-map   { background:rgba(59,130,246,0.12);  color:#93c5fd; border:1px solid rgba(59,130,246,0.2);  }
+    .tag-chat  { background:rgba(245,158,11,0.12);  color:#fcd34d; border:1px solid rgba(245,158,11,0.2);  }
+
+    /* ── User row ── */
+    .user-row { display:flex; align-items:center; gap:12px; }
+    .avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0; }
+    .av1 { background:linear-gradient(135deg,#4f8ef7,#7c5cfc); }
+    .av2 { background:linear-gradient(135deg,#f59e0b,#ef4444); }
+    .av3 { background:linear-gradient(135deg,#34d399,#059669); }
+    .av4 { background:linear-gradient(135deg,#f472b6,#ec4899); }
+    .av5 { background:linear-gradient(135deg,#fb923c,#f97316); }
+    .av6 { background:linear-gradient(135deg,#a78bfa,#7c3aed); }
+    .av7 { background:linear-gradient(135deg,#38bdf8,#0284c7); }
+    .u-name { font-size:14px; font-weight:500; }
+    .u-meta  { font-size:12px; color:var(--dim); }
+
+    /* ── Grids ── */
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px; }
+
+    /* ── Pills ── */
+    .pill-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:48px; }
+    .pill { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:40px; border:1px solid var(--border); background:var(--panel); font-size:13px; color:var(--muted); }
+    .pill-dot { width:6px; height:6px; border-radius:50%; }
+    .pd-ai    { background:#818cf8; }
+    .pd-music { background:#34d399; }
+    .pd-map   { background:#60a5fa; }
+    .pd-chat  { background:#f59e0b; }
+
+    /* ── CTA ── */
+    .cta { text-align:center; padding:60px 40px 80px; }
+    .cta h2 { font-family:'Syne',sans-serif; font-size:32px; font-weight:800; margin-bottom:14px; }
+    .cta p { color:var(--muted); font-size:16px; margin-bottom:32px; }
+    .btn { display:inline-block; padding:14px 36px; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-family:'Syne',sans-serif; font-weight:700; font-size:15px; text-decoration:none; transition:opacity .2s, transform .1s; }
+    .btn:hover { opacity:.9; transform:translateY(-1px); }
+
+    @media(max-width:768px) {
+      .featured, .grid3, .grid2 { grid-template-columns:1fr; }
+      .stats { gap:24px; }
+      .divider { display:none; }
+      .section { padding:40px 20px; }
+      .hero { padding:60px 20px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="brand">✦ Breathify</div>
+    <h1>Real people.<br><span>Real healing.</span></h1>
+    <p>Thousands have found calm, clarity, and connection through Breathify. Here are their stories.</p>
+    <div class="stats">
+      <div><div class="stat-num">100+</div><div class="stat-lbl">Lives touched</div></div>
+      <div class="divider"></div>
+      <div><div class="stat-num">4.9★</div><div class="stat-lbl">Avg rating</div></div>
+      <div class="divider"></div>
+      <div><div class="stat-num">98%</div><div class="stat-lbl">Felt better</div></div>
+      <div class="divider"></div>
+      <div><div class="stat-num">24/7</div><div class="stat-lbl">Always there</div></div>
+    </div>
+  </div>
+
+  <!-- ── Testimonials ── -->
+  <div class="section">
+    <div class="sec-head">
+      <h2>Stories that moved us</h2>
+      <p>From anxiety to peace — our community shares it all</p>
+    </div>
+
+    <!-- Featured 2 big cards -->
+    <div class="featured">
+      <div class="card big">
+        <div class="feature-tag tag-ai">✦ AI Health Assistant</div>
+        <div class="stars">★★★★★</div>
+        <div class="quote-mark">"</div>
+        <p class="quote-text">I was having a panic attack at 2am and had nobody to call. Breathify's AI walked me through everything — my breathing, my thoughts, my fears. By morning I had an actual plan. It didn't just answer my question, it understood what I was going through.</p>
+        <div class="user-row">
+          <div class="avatar av1">R</div>
+          <div><div class="u-name">Riya Sharma</div><div class="u-meta">Mumbai · Anxiety recovery</div></div>
+        </div>
+      </div>
+      <div class="card big">
+        <div class="feature-tag tag-chat">💬 Doctor Consultation</div>
+        <div class="stars">★★★★★</div>
+        <div class="quote-mark">"</div>
+        <p class="quote-text">I was embarrassed to talk about my depression in person. The consultation chat on Breathify gave me a safe space to open up honestly. My doctor here actually read everything and responded with such empathy. It changed how I see seeking help.</p>
+        <div class="user-row">
+          <div class="avatar av2">A</div>
+          <div><div class="u-name">Arjun Mehta</div><div class="u-meta">Delhi · Depression support</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 column grid -->
+    <div class="grid3">
+      <div class="card">
+        <div class="feature-tag tag-music">♪ Therapy Music</div>
+        <div class="stars">★★★★★</div>
+        <p class="quote-text" style="font-size:14px;">"The sleep therapy playlist literally changed my life. I hadn't slept properly in 8 months. Three nights in, I was sleeping 7 hours straight. My therapist was shocked."</p>
+        <div class="user-row">
+          <div class="avatar av3">P</div>
+          <div><div class="u-name">Priya Nair</div><div class="u-meta">Bangalore · Insomnia</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="feature-tag tag-map">📍 Nearby Centres</div>
+        <div class="stars">★★★★★</div>
+        <p class="quote-text" style="font-size:14px;">"I'd been trying to find a therapist for months. Breathify's map showed me a centre 1.2km from my house I never knew existed. I've been going weekly since."</p>
+        <div class="user-row">
+          <div class="avatar av4">S</div>
+          <div><div class="u-name">Sneha Kapoor</div><div class="u-meta">Pune · Stress management</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="feature-tag tag-ai">✦ AI Assistant</div>
+        <div class="stars">★★★★★</div>
+        <p class="quote-text" style="font-size:14px;">"I asked it something I was too ashamed to Google. It answered without judgment, gave me resources, and checked in the next session. That level of care from an app blew my mind."</p>
+        <div class="user-row">
+          <div class="avatar av5">K</div>
+          <div><div class="u-name">Karan Joshi</div><div class="u-meta">Hyderabad · OCD support</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 column grid -->
+    <div class="grid2">
+      <div class="card">
+        <div class="feature-tag tag-music">♪ Therapy Music</div>
+        <div class="stars">★★★★★</div>
+        <p class="quote-text" style="font-size:14px;">"I use the focus music during my therapy exercises and it actually helps me stay in the moment. My psychologist recommended Breathify and I'm so glad she did."</p>
+        <div class="user-row">
+          <div class="avatar av6">N</div>
+          <div><div class="u-name">Neha Verma</div><div class="u-meta">Chennai · ADHD management</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="feature-tag tag-chat">💬 Doctor Consultation</div>
+        <div class="stars">★★★★★</div>
+        <p class="quote-text" style="font-size:14px;">"Getting a second opinion used to mean months of waiting. Here I described my symptoms, shared my reports, and got a thoughtful response within hours. Genuinely life changing."</p>
+        <div class="user-row">
+          <div class="avatar av7">V</div>
+          <div><div class="u-name">Vikram Rao</div><div class="u-meta">Kolkata · Chronic stress</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature pills -->
+    <div class="pill-row">
+      <div class="pill"><span class="pill-dot pd-ai"></span> AI Health Assistant</div>
+      <div class="pill"><span class="pill-dot pd-music"></span> Therapy Music</div>
+      <div class="pill"><span class="pill-dot pd-map"></span> Nearby Health Centres</div>
+      <div class="pill"><span class="pill-dot pd-chat"></span> Doctor Consultation</div>
+    </div>
+  </div>
+
+  <!-- ── CTA ── -->
+  <div class="cta">
+    <h2>Your story starts here.</h2>
+    <p>Join thousands who chose to breathe easier, live better, heal deeper.</p>
+    <a class="btn" href="/box/quiz">Start your journey →</a>
+  </div>
+
+</body>
+</html>

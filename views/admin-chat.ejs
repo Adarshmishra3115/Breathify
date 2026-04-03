@@ -75,12 +75,15 @@
 
 <aside class="sidebar">
   <div class="sidebar-header">
-    <div class="brand">Breathify <span class="badge">Admin</span></div>
+    <a href="/">
+      <div class="brand">Breathify <span class="badge">Admin</span></div>
+    </a>
+<!-- //<div class="brand">Breathify <span class="badge">Admin</span></div> -->
     <div class="me-pill">
       <div class="avatar av-admin"><%= currentUser.fullName[0].toUpperCase() %></div>
       <div>
         <div class="me-name"><%= currentUser.fullName %></div>
-        <div class="me-role">Administrator</div>
+        <div class="me-role">DOCTOR</div>
       </div>
     </div>
   </div>
@@ -89,7 +92,7 @@
     <input class="search-input" type="text" placeholder="Search users…" oninput="filterList(this.value)"/>
   </div>
 
-  <div class="sec-label">All Users (<%= users.length %>)</div>
+  <div class="sec-label">All Patients (<%= users.length %>)</div>
 
   <div class="contact-list" id="contactList">
     <% users.forEach(u => { %>

@@ -69,7 +69,10 @@
 
 <aside class="sidebar">
   <div class="sidebar-header">
-    <div class="brand">Breathify</div>
+    <a href="/">
+      <div class="brand">Breathify</div>
+    </a>
+    
     <div class="me-pill">
       <div class="avatar av-user"><%= currentUser.fullName[0].toUpperCase() %></div>
       <div>
@@ -79,7 +82,7 @@
     </div>
   </div>
 
-  <div class="sec-label">Support Team</div>
+  <div class="sec-label">DOCTORS</div>
 
   <div class="contact-list">
     <% admins.forEach(admin => { %>
