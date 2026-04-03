@@ -26,13 +26,18 @@ const userSchema = new Schema({
         required: true,
 
     },
+    role: {                          // ← ADD THIS
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+    },
     salt: {
         type: String,
     },
 
 }, { timestamps: true });
 
-userSchema.pre("save", async function() {
+userSchema.pre("save", async function () {
     const user = this;
 
     if (!user.isModified("password")) return;
@@ -46,5 +51,5 @@ userSchema.pre("save", async function() {
 
 });
 
-const User = model("user", userSchema);
+const User = model("User", userSchema);
 module.exports = User;

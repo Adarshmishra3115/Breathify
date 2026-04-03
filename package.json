@@ -19,6 +19,7 @@
         "jsonwebtoken": "^9.0.3",
         "mongoose": "^9.3.3",
         "node": "^25.8.2",
-        "node-fetch": "^3.3.2"
+        "node-fetch": "^3.3.2",
+        "socket.io": "^4.8.3"
     }
 }

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %> · Breathify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f14; --sidebar: #10121a; --panel: #13161e; --border: #1e2230;
+      --accent: #4f8ef7; --accent2: #7c5cfc; --sent: #1a2a4a; --recv: #181c28;
+      --text: #e8eaf0; --muted: #5a6278; --online: #34d399;
+    }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; }
+    .sidebar { width: 280px; min-width: 280px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .sidebar-header { padding: 20px 18px 14px; border-bottom: 1px solid var(--border); }
+    .brand { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .me-pill { margin-top: 10px; display: flex; align-items: center; gap: 10px; background: rgba(79,142,247,0.07); border: 1px solid rgba(79,142,247,0.15); border-radius: 10px; padding: 8px 12px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+    .av-user  { background: linear-gradient(135deg, #4f8ef7, #7c5cfc); }
+    .av-admin { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .me-name { font-size: 13px; font-weight: 500; }
+    .me-role { font-size: 11px; color: var(--muted); }
+    .sec-label { padding: 14px 18px 6px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+    .contact-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+    .contact { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; text-decoration: none; color: var(--text); transition: background .15s; margin-bottom: 2px; }
+    .contact:hover { background: rgba(255,255,255,0.04); }
+    .contact.active { background: rgba(79,142,247,0.1); }
+    .contact.active .c-name { color: var(--accent); }
+    .c-av { position: relative; }
+    .dot { position: absolute; bottom: 1px; right: 1px; width: 8px; height: 8px; background: var(--online); border-radius: 50%; border: 2px solid var(--sidebar); }
+    .c-name { font-size: 14px; font-weight: 500; }
+    .c-sub  { font-size: 11px; color: var(--muted); }
+    .sidebar-footer { padding: 12px 14px; border-top: 1px solid var(--border); }
+    .logout { display: block; text-align: center; padding: 9px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 13px; text-decoration: none; transition: all .2s; }
+    .logout:hover { border-color: #f87171; color: #f87171; }
+    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); background-image: radial-gradient(ellipse 60% 40% at 80% 0%, rgba(79,142,247,0.06), transparent); }
+    .topbar { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: rgba(13,15,20,0.85); backdrop-filter: blur(8px); }
+    .topbar-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; }
+    .topbar-status { font-size: 12px; color: var(--online); margin-top: 1px; }
+    .messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 8px; }
+    .messages::-webkit-scrollbar { width: 3px; }
+    .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--muted); gap: 8px; }
+    .empty-icon { font-size: 38px; opacity: .35; }
+    .bwrap { display: flex; flex-direction: column; max-width: 65%; animation: up .2s ease; }
+    @keyframes up { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+    .bwrap.sent { align-self: flex-end; align-items: flex-end; }
+    .bwrap.recv { align-self: flex-start; align-items: flex-start; }
+    .bmeta { font-size: 11px; color: var(--muted); margin-bottom: 3px; padding: 0 4px; }
+    .bubble { padding: 10px 15px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+    .bubble.sent { background: var(--sent); border: 1px solid rgba(79,142,247,0.2); border-bottom-right-radius: 4px; color: #c8d8f8; }
+    .bubble.recv { background: var(--recv); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .btime { font-size: 10px; color: var(--muted); margin-top: 3px; padding: 0 4px; }
+    .input-bar { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-end; background: rgba(13,15,20,0.85); backdrop-filter: blur(8px); }
+    .msg-input { flex: 1; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; color: var(--text); font-family: inherit; font-size: 14px; resize: none; outline: none; max-height: 120px; overflow-y: auto; transition: border-color .2s; line-height: 1.5; }
+    .msg-input:focus { border-color: var(--accent); }
+    .msg-input::placeholder { color: var(--muted); }
+    .send-btn { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity .2s, transform .1s; flex-shrink: 0; }
+    .send-btn:hover { opacity: .9; }
+    .send-btn:active { transform: scale(.93); }
+    .no-chat { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand">Breathify</div>
+    <div class="me-pill">
+      <div class="avatar av-user"><%= currentUser.fullName[0].toUpperCase() %></div>
+      <div>
+        <div class="me-name"><%= currentUser.fullName %></div>
+        <div class="me-role">User</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Support Team</div>
+
+  <div class="contact-list">
+    <% admins.forEach(admin => { %>
+      <a href="/chat/user_chat?with=<%= admin._id %>"
+         class="contact <%= selectedAdmin && selectedAdmin._id.toString() === admin._id.toString() ? 'active' : '' %>">
+        <div class="c-av">
+          <div class="avatar av-admin"><%= admin.fullName[0].toUpperCase() %></div>
+          <div class="dot"></div>
+        </div>
+        <div>
+          <div class="c-name"><%= admin.fullName %></div>
+          <div class="c-sub">Administrator</div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+
+  <div class="sidebar-footer">
+    <a href="/user/logout" class="logout">Sign out</a>
+  </div>
+</aside>
+
+<main class="chat-main">
+  <% if (selectedAdmin) { %>
+
+    <div class="topbar">
+      <div class="avatar av-admin"><%= selectedAdmin.fullName[0].toUpperCase() %></div>
+      <div>
+        <div class="topbar-name"><%= selectedAdmin.fullName %></div>
+        <div class="topbar-status">● Online</div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <% if (messages.length === 0) { %>
+        <div class="empty" id="emptyState">
+          <div class="empty-icon">💬</div>
+          <div>Start a conversation with <%= selectedAdmin.fullName %></div>
+        </div>
+      <% } else { %>
+        <% messages.forEach(msg => { %>
+          <% const isSent = msg.senderId._id.toString() === currentUser._id.toString(); %>
+          <div class="bwrap <%= isSent ? 'sent' : 'recv' %>">
+            <% if (!isSent) { %><div class="bmeta"><%= msg.senderId.fullName %></div><% } %>
+            <div class="bubble <%= isSent ? 'sent' : 'recv' %>"><%= msg.message %></div>
+            <div class="btime"><%= new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) %></div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <div class="input-bar">
+      <textarea class="msg-input" id="msgInput" placeholder="Type a message…" rows="1"
+        oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+
+  <% } else { %>
+    <div class="no-chat">No admins available right now.</div>
+  <% } %>
+</main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const ME = { _id: "<%= currentUser._id %>", fullName: "<%= currentUser.fullName %>", role: "user" };
+   <% if (selectedAdmin) { %>  
+  const PARTNER_ID = "<%= selectedAdmin._id %>";
+
+  const socket = io();
+
+  socket.emit("join", { userId: ME._id, userName: ME.fullName, role: ME.role, partnerId: PARTNER_ID });
+
+  socket.on("receiveMessage", (msg) => {
+    removeEmpty();
+    appendBubble(msg);
+    scrollBottom();
+  });
+
+  function sendMsg() {
+    const input = document.getElementById("msgInput");
+    const text  = input.value.trim();
+    if (!text) return;
+    socket.emit("send_message", { receiverId: PARTNER_ID, message: text });
+    input.value = "";
+    input.style.height = "";
+  }
+
+  function appendBubble(msg) {
+    const isSent = msg.senderId._id.toString() === ME._id;
+    const wrap   = document.createElement("div");
+    wrap.className = "bwrap " + (isSent ? "sent" : "recv");
+    const time = new Date(msg.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    wrap.innerHTML = `
+      ${!isSent ? `<div class="bmeta">${esc(msg.senderId.fullName)}</div>` : ''}
+      <div class="bubble ${isSent ? 'sent' : 'recv'}">${esc(msg.message)}</div>
+      <div class="btime">${time}</div>`;
+    document.getElementById("messages").appendChild(wrap);
+  }
+
+  function removeEmpty()  { const e = document.getElementById("emptyState"); if (e) e.remove(); }
+  function scrollBottom() { const m = document.getElementById("messages"); m.scrollTop = m.scrollHeight; }
+  function autoResize(el) { el.style.height = ""; el.style.height = Math.min(el.scrollHeight, 120) + "px"; }
+  function handleKey(e)   { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+  function esc(str)       { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  scrollBottom();
+   <% } %>
+</script>
+</body>
+</html>
