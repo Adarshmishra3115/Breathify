@@ -51,7 +51,7 @@ app.use("/chat",  chatRouter);
 app.use("/overcame" , overcameRouter);
 
 app.get("/", (req, res) => {
-    res.render("home", { title: "Breathify" });
+    res.render("home", { title: "Breathify" , user: req.user || null});
 });
 
 /* ── Socket.io ───────────────────────────────────────────── */

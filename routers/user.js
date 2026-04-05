@@ -18,6 +18,11 @@ router.get("/signin", (req,res)=>{
 
 router.post("/signup", async (req, res) => {
     const {fullName, email, password, age, gender} = req.body;
+
+     if (!password || password.length < 4) {
+        return res.send("Password must be at least 4 characters long");
+        // or res.status(400).send(...)
+    }
     
     //console.log("BODY:", req.body);          // ← check form data
     
