@@ -21,7 +21,11 @@ const Conversation = require("./models/conversation");
 
 const path = require("path");
 
-mongoose.connect("mongodb://127.0.0.1:27017/breathify")
+// mongoose.connect("mongodb://127.0.0.1:27017/breathify")
+//     .then(() => console.log("MongoDB Connected"))
+//     .catch(err => console.log(err));
+
+    mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected"))
     .catch(err => console.log(err));
 
@@ -29,7 +33,15 @@ const app = express();
 
 // ── Create server + io BEFORE routes so req.app.get("io") always works ──
 const server = http.createServer(app);
-const io     = new Server(server);
+//const io     = new Server(server);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",   // allow all (for now)
+        methods: ["GET", "POST"]
+    }
+});
+
 app.set("io", io);
 
 app.set("view engine", "ejs");
@@ -159,6 +171,7 @@ io.on("connection", (socket) => {
 });
 
 /* ── Start ───────────────────────────────────────────────── */
-server.listen(5000, () => {
-    console.log("Server running on http://localhost:5000");
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
