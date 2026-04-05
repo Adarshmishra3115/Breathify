@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Message = require("../models/Message");
-const Conversation = require("../models/conversation");
+const Conversation = require("../models/Conversation");
 const User = require("../models/user");
 const { isLoggedIn } = require("../middleware/authentication");
 
