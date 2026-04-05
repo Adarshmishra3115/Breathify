@@ -17,7 +17,7 @@ const overcameRouter = require("./routers/overcame");
 const { checkForCookieAuthentication, isLoggedIn } = require("./middleware/authentication");
 
 const Message      = require("./models/Message");
-const Conversation = require("./models/conversation");
+const Conversation = require("./models/Conversation");
 
 const path = require("path");
 
