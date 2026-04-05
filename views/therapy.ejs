@@ -1,232 +1,609 @@
 <%- include("partials/header") %>
-    <%- include("partials/navbar2") %>
+<%- include("partials/navbar2") %>
 
-        <style>
-            body {
-                margin: 0;
-                font-family: 'Poppins', sans-serif;
-                background: linear-gradient(135deg, #2b5876, #4e4376);
-                color: white;
-            }
-            /* WRAPPER */
-            
-            .wrapper {
-                max-width: 1100px;
-                margin: auto;
-                padding: 40px 20px;
-            }
-            /* TITLE */
-            
-            .title {
-                text-align: center;
-                margin-bottom: 30px;
-            }
-            
-            .title h1 {
-                font-size: 2.5rem;
-                text-shadow: 0 0 20px rgba(0, 198, 255, 0.6);
-            }
-            /* GRID */
-            
-            .grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 30px;
-            }
-            /* CARD */
-            
-            .card {
-                padding: 25px;
-                border-radius: 20px;
-                background: rgba(255, 255, 255, 0.08);
-                backdrop-filter: blur(20px);
-                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-                transition: 0.3s;
-            }
-            
-            .card:hover {
-                transform: translateY(-5px);
-            }
-            /* SONG */
-            
-            .song {
-                padding: 14px;
-                margin: 10px 0;
-                border-radius: 12px;
-                cursor: pointer;
-                background: rgba(255, 255, 255, 0.1);
-                transition: 0.3s;
-            }
-            
-            .song:hover {
-                background: rgba(255, 255, 255, 0.25);
-                transform: translateX(5px);
-            }
-            /* INPUT */
-            
-            input {
-                width: 100%;
-                padding: 12px;
-                border-radius: 10px;
-                border: none;
-                margin-top: 10px;
-            }
-            
-            input:focus {
-                outline: none;
-                box-shadow: 0 0 10px rgba(0, 198, 255, 0.7);
-            }
-            /* BUTTON */
-            
-            .btn {
-                margin-top: 10px;
-                padding: 10px 20px;
-                border-radius: 20px;
-                border: none;
-                background: linear-gradient(90deg, #4facfe, #00c6ff);
-                color: white;
-                cursor: pointer;
-            }
-            /* CONTROLS */
-            
-            .controls {
-                margin-top: 15px;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
-            
-            .controls button {
-                padding: 10px;
-                border-radius: 50%;
-                border: none;
-                background: linear-gradient(90deg, #4facfe, #00c6ff);
-                color: white;
-                cursor: pointer;
-                font-size: 16px;
-            }
-            
-            .controls input {
-                width: 120px;
-            }
-            /* RESPONSIVE */
-            
-            @media(max-width: 768px) {
-                .grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-        </style>
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        <div class="wrapper">
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(160deg, #dff0fb, #b8dcf5, #e8f4fd);
+        min-height: 100vh;
+        color: #1e3a52;
+    }
 
-            <div class="title">
-                <h1>🎧 Therapy Zone</h1>
-                <p>Relax. Breathe. Let the music heal.</p>
+    .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 50px 20px 70px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-header h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #1a4a6e;
+        margin-bottom: 6px;
+    }
+
+    .page-header p {
+        font-size: 0.95rem;
+        color: #5a8aaa;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 680px) {
+        .grid { grid-template-columns: 1fr; }
+        .page-header h1 { font-size: 1.6rem; }
+    }
+
+    .panel {
+        background: #ffffffcc;
+        border: 1px solid #c2ddf0;
+        border-radius: 16px;
+        padding: 24px;
+        backdrop-filter: blur(8px);
+    }
+
+    .panel-title {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #7aaac8;
+        margin-bottom: 16px;
+    }
+
+    .song-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 20px;
+    }
+
+    .song-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .song-item:hover { background: #e3f2fc; }
+
+    .song-item.active {
+        background: #d6edf9;
+        border-color: #7ab8d8;
+    }
+
+    .song-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: #c8e3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .song-meta { flex: 1; }
+    .song-name { font-size: 13px; font-weight: 600; color: #1a3d5c; }
+    .song-sub  { font-size: 11px; color: #7aaac8; margin-top: 1px; }
+    .song-dur  { font-size: 11px; color: #a0bfd4; }
+
+    .player-bar {
+        background: #eaf5fc;
+        border: 1px solid #b8d8ee;
+        border-radius: 12px;
+        padding: 16px 18px;
+    }
+
+    .now-playing {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .np-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #4fa8d5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .np-title { font-size: 13px; font-weight: 600; color: #1a3d5c; }
+    .np-sub   { font-size: 11px; color: #7aaac8; margin-top: 1px; }
+
+    .seek-wrap { margin-bottom: 12px; }
+
+    .seek-bar {
+        position: relative;
+        height: 4px;
+        background: #c2ddf0;
+        border-radius: 2px;
+        cursor: pointer;
+        margin-bottom: 5px;
+    }
+
+    .seek-fill {
+        height: 100%;
+        background: #3a9ad4;
+        border-radius: 2px;
+        width: 0%;
+        pointer-events: none;
+    }
+
+    .seek-thumb {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #1a7ab5;
+        left: 0%;
+    }
+
+    .seek-times {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #90bcd6;
+    }
+
+    .controls-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ctrl-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1px solid #b8d8ee;
+        background: white;
+        color: #3a7fa8;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s, transform 0.1s;
+        flex-shrink: 0;
+    }
+
+    .ctrl-btn:hover { background: #d6edf9; }
+    .ctrl-btn:active { transform: scale(0.93); }
+
+    .ctrl-btn.play-btn {
+        width: 40px;
+        height: 40px;
+        background: #3a9ad4;
+        border-color: #3a9ad4;
+        color: white;
+        font-size: 15px;
+    }
+
+    .ctrl-btn.play-btn:hover { background: #2d88be; }
+
+    .vol-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+    }
+
+    .vol-icon { font-size: 12px; color: #7aaac8; }
+
+    .vol-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 65px;
+        height: 3px;
+        background: #c2ddf0;
+        border-radius: 2px;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .vol-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #3a9ad4;
+        cursor: pointer;
+    }
+
+    .status-line {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #b8d8ee;
+        flex-shrink: 0;
+        transition: background 0.3s;
+    }
+
+    .status-dot.playing { background: #38c17a; }
+    .status-text { font-size: 11px; color: #7aaac8; }
+
+    .search-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 9px 13px;
+        background: white;
+        border: 1px solid #c2ddf0;
+        border-radius: 9px;
+        color: #1a3d5c;
+        font-size: 13px;
+        font-family: 'Segoe UI', sans-serif;
+        outline: none;
+    }
+
+    .search-input::placeholder { color: #a8cfe3; }
+    .search-input:focus { border-color: #4fa8d5; }
+
+    .search-btn {
+        padding: 9px 16px;
+        background: #3a9ad4;
+        border: none;
+        border-radius: 9px;
+        color: white;
+        font-size: 13px;
+        font-family: 'Segoe UI', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+
+    .search-btn:hover { background: #2d88be; }
+
+    #player {
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 14px;
+    }
+
+    #player iframe { border-radius: 10px; display: block; }
+
+    .yt-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .yt-vol-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;
+    }
+</style>
+
+
+<div class="page">
+
+    <div class="page-header">
+        <h1>🎧 Therapy Zone</h1>
+        <p>Relax. Breathe. Let the music heal.</p>
+    </div>
+
+    <div class="grid">
+
+        <!-- LOCAL SOUNDS -->
+        <div class="panel">
+            <div class="panel-title">Curated Sounds</div>
+
+            <div class="song-list">
+                <div class="song-item" onclick="playLocal('/audio/rain.mp3', 'Rain', 'Ambient · Calming', '🌧', this)">
+                    <div class="song-icon">🌧</div>
+                    <div class="song-meta">
+                        <div class="song-name">Rain</div>
+                        <div class="song-sub">Ambient · Calming</div>
+                    </div>
+                    <div class="song-dur">12:00</div>
+                </div>
+
+                <div class="song-item" onclick="playLocal('/audio/piano.mp3', 'Calm Piano', 'Instrumental · Focus', '🎹', this)">
+                    <div class="song-icon">🎹</div>
+                    <div class="song-meta">
+                        <div class="song-name">Calm Piano</div>
+                        <div class="song-sub">Instrumental · Focus</div>
+                    </div>
+                    <div class="song-dur">8:00</div>
+                </div>
+
+                <div class="song-item" onclick="playLocal('/audio/Spring_Flowers.mp3', 'Forest Birds', 'Nature · Grounding', '🌿', this)">
+                    <div class="song-icon">🌿</div>
+                    <div class="song-meta">
+                        <div class="song-name">Forest Birds</div>
+                        <div class="song-sub">Nature · Grounding</div>
+                    </div>
+                    <div class="song-dur">15:00</div>
+                </div>
+
+                <div class="song-item" onclick="playLocal('/audio/ocean.mp3', 'Ocean Waves', 'Ambient · Sleep', '🌊', this)">
+                    <div class="song-icon">🌊</div>
+                    <div class="song-meta">
+                        <div class="song-name">Ocean Waves</div>
+                        <div class="song-sub">Ambient · Sleep</div>
+                    </div>
+                    <div class="song-dur">20:00</div>
+                </div>
             </div>
 
-            <div class="grid">
+            <!-- STATUS -->
+            <div class="status-line">
+                <span class="status-dot" id="localDot"></span>
+                <span class="status-text" id="localStatus">Select a sound above</span>
+            </div>
 
-                <!-- LOCAL MUSIC -->
-                <div class="card">
-                    <h2>🌊 Our Calming Sounds</h2>
-
-                    <div class="song" onclick="playLocal('/audio/rain.mp3')">🌧 Rain</div>
-                    <div class="song" onclick="playLocal('/audio/calm.mp3')">🎶 Calm Piano</div>
-
-                    <audio id="localAudio"></audio>
-
-                    <div class="controls">
-                        <button onclick="audio.play()">▶</button>
-                        <button onclick="audio.pause()">⏸</button>
+            <!-- PLAYER BAR -->
+            <div class="player-bar">
+                <div class="now-playing">
+                    <div class="np-icon" id="npIcon">🎵</div>
+                    <div>
+                        <div class="np-title" id="npTitle">Nothing playing</div>
+                        <div class="np-sub" id="npSub">—</div>
                     </div>
                 </div>
 
-                <!-- YOUTUBE SEARCH -->
-                <div class="card">
-                    <h2>🔍 Play Your Own</h2>
-
-                    <input id="songInput" placeholder="Search any song..." />
-                    <button class="btn" onclick="searchYT()">Play 🎧</button>
-
-                    <!-- hidden player -->
-                    <div id="player"></div>
-
-                    <!-- controls -->
-                    <div class="controls">
-                        <button onclick="playVideo()">▶</button>
-                        <button onclick="pauseVideo()">⏸</button>
-                        <button onclick="stopVideo()">⏹</button>
-
-                        <input type="range" min="0" max="100" value="50" onchange="setVolume(this.value)">
+                <div class="seek-wrap">
+                    <div class="seek-bar" onclick="seekTo(event)">
+                        <div class="seek-fill" id="seekFill"></div>
+                        <div class="seek-thumb" id="seekThumb"></div>
+                    </div>
+                    <div class="seek-times">
+                        <span id="timeElapsed">0:00</span>
+                        <span id="timeDuration">0:00</span>
                     </div>
                 </div>
 
+                <div class="controls-row">
+                    <button class="ctrl-btn" onclick="localPrev()">⏮</button>
+                    <button class="ctrl-btn play-btn" id="localPlayBtn" onclick="toggleLocalPlay()">▶</button>
+                    <button class="ctrl-btn" onclick="localNext()">⏭</button>
+                    <button class="ctrl-btn" id="loopBtn" onclick="toggleLoop()" title="Loop">🔁</button>
+                    <div class="vol-wrap">
+                        <span class="vol-icon">🔉</span>
+                        <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" oninput="setLocalVolume(this.value)">
+                    </div>
+                </div>
             </div>
-
         </div>
 
-        <!-- YOUTUBE API -->
-        <script src="https://www.youtube.com/iframe_api"></script>
+        <!-- YOUTUBE PANEL -->
+        <div class="panel">
+            <div class="panel-title">Play Any Song</div>
 
-        <script>
-            let player;
-            let audio = document.getElementById("localAudio");
+            <div class="search-row">
+                <input class="search-input" id="songInput" placeholder="Search YouTube..." onkeydown="if(event.key==='Enter') searchYT()" />
+                <button class="search-btn" onclick="searchYT()">Search</button>
+            </div>
 
-            // YT INIT
-            function onYouTubeIframeAPIReady() {
-                player = new YT.Player('player', {
-                    height: '300',
-                    width: '400',
-                    videoId: '',
-                    playerVars: {
-                        autoplay: 0
-                    }
-                });
-            }
+            <div id="player"></div>
 
-            // LOCAL
-            function playLocal(src) {
-                audio.src = src;
-                audio.play();
+            <div class="status-line">
+                <span class="status-dot" id="ytDot"></span>
+                <span class="status-text" id="ytStatus">Search for a song to play</span>
+            </div>
 
-                if (player) player.stopVideo();
-            }
+            <div class="yt-controls">
+                <button class="ctrl-btn" onclick="playVideo()">▶</button>
+                <button class="ctrl-btn play-btn" onclick="pauseVideo()">⏸</button>
+                <button class="ctrl-btn" onclick="stopVideo()">⏹</button>
+                <div class="yt-vol-wrap">
+                    <span class="vol-icon">🔉</span>
+                    <input type="range" class="vol-slider" min="0" max="100" step="1" value="70" oninput="setVolume(this.value)">
+                </div>
+            </div>
+        </div>
 
-            // SEARCH YT
-            async function searchYT() {
-                const query = document.getElementById("songInput").value;
+    </div>
+</div>
 
-                if (!query) return alert("Enter song");
+<audio id="localAudio"></audio>
+<script src="https://www.youtube.com/iframe_api"></script>
 
-                const res = await fetch(`/yt/search?q=${query}`);
-                const data = await res.json();
+<script>
+    const audio       = document.getElementById('localAudio');
+    const localDot    = document.getElementById('localDot');
+    const localStatus = document.getElementById('localStatus');
+    const playBtn     = document.getElementById('localPlayBtn');
+    const npTitle     = document.getElementById('npTitle');
+    const npSub       = document.getElementById('npSub');
+    const npIcon      = document.getElementById('npIcon');
+    const seekFill    = document.getElementById('seekFill');
+    const seekThumb   = document.getElementById('seekThumb');
+    const timeEl      = document.getElementById('timeElapsed');
+    const timeDur     = document.getElementById('timeDuration');
+    const loopBtn     = document.getElementById('loopBtn');
+    const ytDot       = document.getElementById('ytDot');
+    const ytStatus    = document.getElementById('ytStatus');
 
-                if (!data.videoId) {
-                    alert("No song found");
-                    return;
-                }
+    const songs = [
+        { src: '/audio/rain.mp3',   name: 'Rain',         sub: 'Ambient · Calming',    icon: '🌧' },
+        { src: '/audio/piano.mp3',  name: 'Calm Piano',   sub: 'Instrumental · Focus', icon: '🎹' },
+        { src: '/audio/forest.mp3', name: 'Forest Birds', sub: 'Nature · Grounding',   icon: '🌿' },
+        { src: '/audio/ocean.mp3',  name: 'Ocean Waves',  sub: 'Ambient · Sleep',      icon: '🌊' },
+    ];
 
-                audio.pause();
-                player.loadVideoById(data.videoId);
-            }
+    let currentIdx = -1;
+    let isLooping  = false;
+    let activeItem = null;
+    let player;
 
-            // CONTROLS
-            function playVideo() {
-                if (player) player.playVideo();
-            }
+    function fmt(s) {
+        if (isNaN(s) || !isFinite(s)) return '0:00';
+        return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+    }
 
-            function pauseVideo() {
-                if (player) player.pauseVideo();
-            }
+    function playLocal(src, name, sub, icon, el) {
+        if (activeItem) activeItem.classList.remove('active');
+        activeItem = el;
+        el.classList.add('active');
+        currentIdx = songs.findIndex(s => s.src === src);
 
-            function stopVideo() {
-                if (player) player.stopVideo();
-            }
+        audio.src    = src;
+        audio.volume = document.querySelector('.vol-slider').value;
+        audio.play();
 
-            function setVolume(val) {
-                if (player) player.setVolume(val);
-            }
-        </script>
+        npTitle.textContent     = name;
+        npSub.textContent       = sub;
+        npIcon.textContent      = icon;
+        localDot.className      = 'status-dot playing';
+        localStatus.textContent = 'Now playing: ' + name;
+        playBtn.textContent     = '⏸';
 
-        <%- include("partials/footer") %>
+        if (player) {
+            player.stopVideo();
+            ytDot.className      = 'status-dot';
+            ytStatus.textContent = 'Paused';
+        }
+    }
+
+    function toggleLocalPlay() {
+        if (!audio.src) return;
+        if (audio.paused) {
+            audio.play();
+            playBtn.textContent = '⏸';
+            localDot.className  = 'status-dot playing';
+        } else {
+            audio.pause();
+            playBtn.textContent = '▶';
+            localDot.className  = 'status-dot';
+        }
+    }
+
+    function localPrev() {
+        if (currentIdx <= 0) return;
+        const s = songs[--currentIdx];
+        playLocal(s.src, s.name, s.sub, s.icon, document.querySelectorAll('.song-item')[currentIdx]);
+    }
+
+    function localNext() {
+        if (currentIdx >= songs.length - 1) return;
+        const s = songs[++currentIdx];
+        playLocal(s.src, s.name, s.sub, s.icon, document.querySelectorAll('.song-item')[currentIdx]);
+    }
+
+    function toggleLoop() {
+        isLooping = !isLooping;
+        audio.loop = isLooping;
+        loopBtn.style.color = isLooping ? '#3a9ad4' : '';
+    }
+
+    function setLocalVolume(val) { audio.volume = val; }
+
+    function seekTo(e) {
+        if (!audio.duration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    }
+
+    audio.addEventListener('timeupdate', () => {
+        if (!audio.duration) return;
+        const pct = (audio.currentTime / audio.duration) * 100;
+        seekFill.style.width = pct + '%';
+        seekThumb.style.left = pct + '%';
+        timeEl.textContent   = fmt(audio.currentTime);
+        timeDur.textContent  = fmt(audio.duration);
+    });
+
+    audio.addEventListener('ended', () => {
+        if (!isLooping) {
+            playBtn.textContent     = '▶';
+            localDot.className      = 'status-dot';
+            localStatus.textContent = 'Playback ended';
+            if (activeItem) activeItem.classList.remove('active');
+        }
+    });
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '200', width: '100%', videoId: '',
+            playerVars: { autoplay: 0, modestbranding: 1, rel: 0 },
+            events: { onStateChange: onPlayerStateChange }
+        });
+    }
+
+    function onPlayerStateChange(e) {
+        if (e.data === YT.PlayerState.PLAYING) {
+            ytDot.className      = 'status-dot playing';
+            ytStatus.textContent = 'Playing from YouTube';
+            audio.pause();
+            playBtn.textContent = '▶';
+            localDot.className  = 'status-dot';
+        } else if (e.data === YT.PlayerState.PAUSED) {
+            ytDot.className      = 'status-dot';
+            ytStatus.textContent = 'Paused';
+        } else if (e.data === YT.PlayerState.ENDED) {
+            ytDot.className      = 'status-dot';
+            ytStatus.textContent = 'Playback ended';
+        }
+    }
+
+    async function searchYT() {
+        const q = document.getElementById('songInput').value.trim();
+        if (!q) return;
+        ytStatus.textContent = 'Searching…';
+        try {
+            const res  = await fetch(`/yt/search?q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            if (!data.videoId) { ytStatus.textContent = 'No results found'; return; }
+            audio.pause();
+            playBtn.textContent = '▶';
+            localDot.className  = 'status-dot';
+            player.loadVideoById(data.videoId);
+        } catch {
+            ytStatus.textContent = 'Error — try again';
+        }
+    }
+
+    function playVideo()  { if (player) player.playVideo(); }
+    function pauseVideo() { if (player) player.pauseVideo(); }
+    function stopVideo()  {
+        if (player) {
+            player.stopVideo();
+            ytDot.className      = 'status-dot';
+            ytStatus.textContent = 'Stopped';
+        }
+    }
+    function setVolume(v) { if (player) player.setVolume(v); }
+</script>
+
+<%- include("partials/footer") %>
