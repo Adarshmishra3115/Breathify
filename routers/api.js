@@ -5,7 +5,7 @@ const router = express.Router();
 const { GoogleGenAI } = require("@google/genai");
 
 
-router.post("/chat", async (req, res) => {
+router.post("/chat", async(req, res) => {
     const { message, history } = req.body;
     console.log(process.env.GEMINI_API_KEY);
     const ai = new GoogleGenAI({

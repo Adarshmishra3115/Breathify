@@ -7,16 +7,16 @@ const cookieParser = require("cookie-parser");
 const http = require("http");
 const { Server } = require("socket.io");
 
-const userRouter  = require("./routers/user");
-const boxRouter   = require("./routers/box");
-const botRouter   = require("./routers/api");
-const ytRouter    = require("./routers/yt_router");
-const chatRouter  = require("./routers/chat");
+const userRouter = require("./routers/user");
+const boxRouter = require("./routers/box");
+const botRouter = require("./routers/api");
+const ytRouter = require("./routers/yt_router");
+const chatRouter = require("./routers/chat");
 const overcameRouter = require("./routers/overcame");
 
 const { checkForCookieAuthentication, isLoggedIn } = require("./middleware/authentication");
 
-const Message      = require("./models/Message");
+const Message = require("./models/Message");
 const Conversation = require("./models/Conversation");
 
 const path = require("path");
@@ -25,7 +25,7 @@ const path = require("path");
 //     .then(() => console.log("MongoDB Connected"))
 //     .catch(err => console.log(err));
 
-    mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected"))
     .catch(err => console.log(err));
 
@@ -37,7 +37,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "*",   // allow all (for now)
+        origin: "*", // allow all (for now)
         methods: ["GET", "POST"]
     }
 });
@@ -55,15 +55,15 @@ app.use(express.json());
 app.use(checkForCookieAuthentication("token"));
 
 /* ── Routes ─────────────────────────────────────────────── */
-app.use("/user",  userRouter);
-app.use("/box",   isLoggedIn, boxRouter);
-app.use("/bot",   botRouter);
-app.use("/yt",    ytRouter);
-app.use("/chat",  chatRouter);
-app.use("/overcame" , overcameRouter);
+app.use("/user", userRouter);
+app.use("/box", isLoggedIn, boxRouter);
+app.use("/bot", botRouter);
+app.use("/yt", ytRouter);
+app.use("/chat", chatRouter);
+app.use("/overcame", overcameRouter);
 
 app.get("/", (req, res) => {
-    res.render("home", { title: "Breathify" , user: req.user || null});
+    res.render("home", { title: "Breathify", user: req.user || null });
 });
 
 /* ── Socket.io ───────────────────────────────────────────── */
@@ -89,15 +89,15 @@ io.on("connection", (socket) => {
         if (role === "admin") socket.join("admin");
 
         if (partnerId) {
-            const roomId = role === "user"
-                ? `conv_u${userId}_a${partnerId}`
-                : `conv_u${partnerId}_a${userId}`;
+            const roomId = role === "user" ?
+                `conv_u${userId}_a${partnerId}` :
+                `conv_u${partnerId}_a${userId}`;
 
             socket.join(roomId);
             socket.currentRoom = roomId;
         }
 
-        socket.userId   = userId.toString();
+        socket.userId = userId.toString();
         socket.userName = userName;
         socket.userRole = role;
 
@@ -109,20 +109,20 @@ io.on("connection", (socket) => {
      * Payload: { receiverId, message }
      * Saves to MongoDB → updates Conversation → emits to shared room
      */
-    socket.on("send_message", async ({ receiverId, message }) => {
+    socket.on("send_message", async({ receiverId, message }) => {
         try {
             if (!message || !message.trim()) return;
 
-            const senderId   = socket.userId;
+            const senderId = socket.userId;
             const senderRole = socket.userRole;
             if (!senderId) return;
 
             let userId, adminId;
             if (senderRole === "user") {
-                userId  = senderId;
+                userId = senderId;
                 adminId = receiverId;
             } else {
-                userId  = receiverId;
+                userId = receiverId;
                 adminId = senderId;
             }
 
@@ -134,29 +134,25 @@ io.on("connection", (socket) => {
             });
 
             // Upsert conversation metadata
-            await Conversation.findOneAndUpdate(
-                { userId, adminId },
-                {
-                    lastMessage:     message.trim(),
-                    lastMessageTime: new Date(),
-                    $inc: { unreadCount: senderRole === "user" ? 1 : 0 }
-                },
-                { upsert: true, returnDocument: 'after'}
-            );
+            await Conversation.findOneAndUpdate({ userId, adminId }, {
+                lastMessage: message.trim(),
+                lastMessageTime: new Date(),
+                $inc: { unreadCount: senderRole === "user" ? 1 : 0 }
+            }, { upsert: true, returnDocument: 'after' });
 
             const payload = {
-                _id:       newMessage._id,
-                senderId:  { _id: senderId, fullName: socket.userName, role: senderRole },
+                _id: newMessage._id,
+                senderId: { _id: senderId, fullName: socket.userName, role: senderRole },
                 receiverId,
-                message:   message.trim(),
-                seen:      false,
+                message: message.trim(),
+                seen: false,
                 createdAt: newMessage.createdAt
             };
 
             // Emit to shared room — both user + admin receive it instantly
-            const roomId = senderRole === "user"
-                ? `conv_u${userId}_a${adminId}`
-                : `conv_u${userId}_a${adminId}`;
+            const roomId = senderRole === "user" ?
+                `conv_u${userId}_a${adminId}` :
+                `conv_u${userId}_a${adminId}`;
 
             io.to(roomId).emit("receiveMessage", payload);
 

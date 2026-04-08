@@ -10,16 +10,26 @@ router.get("/search", async(req, res) => {
     }
 
     try {
+        const musicQuery = `${query} official audio song`;
+
         const response = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=${apiKey}&maxResults=1&type=video`
+            `https://www.googleapis.com/youtube/v3/search?part=snippet` +
+            `&q=${encodeURIComponent(musicQuery)}` +
+            `&key=${apiKey}` +
+            `&maxResults=1` +
+            `&type=video` +
+            `&videoCategoryId=10` +
+            `&topicId=/m/04rlf` +
+            `&videoDuration=medium`
         );
 
         const data = await response.json();
-        console.log("FULL RESPONSE:", data); // 🔥 ADD THIS
 
-        const videoId = data.items[0].id.videoId;
+        if (!data.items || data.items.length === 0) {
+            return res.status(404).json({ error: "No music found" });
+        }
 
-        res.json({ videoId });
+        res.json({ videoId: data.items[0].id.videoId });
 
     } catch (err) {
         console.log(err);
